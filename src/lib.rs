@@ -25,6 +25,28 @@ where
         Self { timer, pin }
     }
     /// Write a single color for ws2812 devices
+    #[cfg(feature = "slow")]
+    fn write_color(&mut self, data: Color) {
+        let mut serial_bits = (data.g as u32) << 16 | (data.r as u32) << 8 | (data.b as u32) << 0;
+        for _ in 0..24 {
+            if (serial_bits & 0x00800000) != 0 {
+                block!(self.timer.wait()).ok();
+                self.pin.set_high();
+                block!(self.timer.wait()).ok();
+                block!(self.timer.wait()).ok();
+                self.pin.set_low();
+            } else {
+                block!(self.timer.wait()).ok();
+                self.pin.set_high();
+                self.pin.set_low();
+                block!(self.timer.wait()).ok();
+                block!(self.timer.wait()).ok();
+            }
+            serial_bits <<= 1;
+        }
+    }
+
+    #[cfg(not(feature = "slow"))]
     fn write_color(&mut self, data: Color) {
         let mut serial_bits = (data.g as u32) << 16 | (data.r as u32) << 8 | (data.b as u32) << 0;
         for _ in 0..24 {
