@@ -18,6 +18,7 @@ cortex-m = "0.5.8"
 cortex-m-rt = "0.6"
 panic-halt = "0.2"
 stm32f0xx-hal = {version = "0.11", features = ["stm32f030x4"]}
+smart-leds = {git = "https://github.com/smart-leds-rs/smart-leds"}
 
 [profile.dev]
 debug = true
