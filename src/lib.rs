@@ -26,10 +26,9 @@ where
     }
     /// Write a single color for ws2812 devices
     #[cfg(feature = "slow")]
-    fn write_color(&mut self, data: Color) {
-        let mut serial_bits = (data.g as u32) << 16 | (data.r as u32) << 8 | (data.b as u32) << 0;
-        for _ in 0..24 {
-            if (serial_bits & 0x00800000) != 0 {
+    fn write_byte(&mut self, data: u8) {
+        for _ in 0..8 {
+            if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
                 self.pin.set_high();
                 block!(self.timer.wait()).ok();
@@ -42,15 +41,14 @@ where
                 block!(self.timer.wait()).ok();
                 block!(self.timer.wait()).ok();
             }
-            serial_bits <<= 1;
+            data <<= 1;
         }
     }
 
     #[cfg(not(feature = "slow"))]
-    fn write_color(&mut self, data: Color) {
-        let mut serial_bits = (data.g as u32) << 16 | (data.r as u32) << 8 | (data.b as u32) << 0;
-        for _ in 0..24 {
-            if (serial_bits & 0x00800000) != 0 {
+    fn write_byte(&mut self, data: u8) {
+        for _ in 0..8 {
+            if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
                 self.pin.set_high();
                 block!(self.timer.wait()).ok();
@@ -63,7 +61,7 @@ where
                 self.pin.set_low();
                 block!(self.timer.wait()).ok();
             }
-            serial_bits <<= 1;
+            data <<= 1;
         }
     }
 }
@@ -81,7 +79,9 @@ where
         T: Iterator<Item = Color>,
     {
         for item in iterator {
-            self.write_color(item);
+            self.write_byte(item.g);
+            self.write_byte(item.r);
+            self.write_byte(item.b);
         }
         // Get a timeout period of 300 ns
         for _ in 0..900 {
