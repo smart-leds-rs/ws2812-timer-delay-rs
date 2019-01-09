@@ -26,7 +26,7 @@ where
     }
     /// Write a single color for ws2812 devices
     #[cfg(feature = "slow")]
-    fn write_byte(&mut self, data: u8) {
+    fn write_byte(&mut self, mut data: u8) {
         for _ in 0..8 {
             if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
@@ -46,7 +46,7 @@ where
     }
 
     #[cfg(not(feature = "slow"))]
-    fn write_byte(&mut self, data: u8) {
+    fn write_byte(&mut self, mut data: u8) {
         for _ in 0..8 {
             if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
