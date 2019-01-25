@@ -1,3 +1,13 @@
+//! # Use ws2812 leds with timers
+//!
+//! - For usage with `smart-leds`
+//! - Implements the `SmartLedsWrite` trait
+//!
+//! The `new` method needs a periodic timer running at 3 MHz
+//!
+//! If it's too slow (e.g.  e.g. all/some leds are white or display the wrong color)
+//! you may want to try the `slow` feature.
+
 #![no_std]
 
 use embedded_hal as hal;
@@ -24,6 +34,7 @@ where
         pin.set_low();
         Self { timer, pin }
     }
+
     /// Write a single color for ws2812 devices
     #[cfg(feature = "slow")]
     fn write_byte(&mut self, mut data: u8) {
@@ -45,6 +56,7 @@ where
         }
     }
 
+    /// Write a single color for ws2812 devices
     #[cfg(not(feature = "slow"))]
     fn write_byte(&mut self, mut data: u8) {
         for _ in 0..8 {
