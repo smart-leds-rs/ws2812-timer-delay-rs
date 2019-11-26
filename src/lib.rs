@@ -19,18 +19,18 @@ use smart_leds_trait::{SmartLedsWrite, RGB8};
 use nb;
 use nb::block;
 
-pub struct Ws2812<'a, TIMER, PIN> {
+pub struct Ws2812<TIMER, PIN> {
     timer: TIMER,
-    pin: &'a mut PIN,
+    pin: PIN,
 }
 
-impl<'a, TIMER, PIN> Ws2812<'a, TIMER, PIN>
+impl<TIMER, PIN> Ws2812<TIMER, PIN>
 where
     TIMER: CountDown + Periodic,
     PIN: OutputPin,
 {
     /// The timer has to already run at with a frequency of 3 MHz
-    pub fn new(timer: TIMER, pin: &'a mut PIN) -> Ws2812<'a, TIMER, PIN> {
+    pub fn new(timer: TIMER, mut pin: PIN) -> Ws2812<TIMER, PIN> {
         pin.set_low().ok();
         Self { timer, pin }
     }
@@ -78,7 +78,7 @@ where
     }
 }
 
-impl<TIMER, PIN> SmartLedsWrite for Ws2812<'_, TIMER, PIN>
+impl<TIMER, PIN> SmartLedsWrite for Ws2812<TIMER, PIN>
 where
     TIMER: CountDown + Periodic,
     PIN: OutputPin,
