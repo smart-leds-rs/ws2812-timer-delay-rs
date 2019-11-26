@@ -12,7 +12,7 @@
 
 use embedded_hal as hal;
 
-use crate::hal::digital::OutputPin;
+use crate::hal::digital::v2::OutputPin;
 use crate::hal::timer::{CountDown, Periodic};
 use smart_leds_trait::{SmartLedsWrite, RGB8};
 
@@ -31,7 +31,7 @@ where
 {
     /// The timer has to already run at with a frequency of 3 MHz
     pub fn new(timer: TIMER, pin: &'a mut PIN) -> Ws2812<'a, TIMER, PIN> {
-        pin.set_low();
+        pin.set_low().ok();
         Self { timer, pin }
     }
 
@@ -41,14 +41,14 @@ where
         for _ in 0..8 {
             if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
-                self.pin.set_high();
+                self.pin.set_high().ok();
                 block!(self.timer.wait()).ok();
                 block!(self.timer.wait()).ok();
-                self.pin.set_low();
+                self.pin.set_low().ok();
             } else {
                 block!(self.timer.wait()).ok();
-                self.pin.set_high();
-                self.pin.set_low();
+                self.pin.set_high().ok();
+                self.pin.set_low().ok();
                 block!(self.timer.wait()).ok();
                 block!(self.timer.wait()).ok();
             }
@@ -62,15 +62,15 @@ where
         for _ in 0..8 {
             if (data & 0x80) != 0 {
                 block!(self.timer.wait()).ok();
-                self.pin.set_high();
+                self.pin.set_high().ok();
                 block!(self.timer.wait()).ok();
                 block!(self.timer.wait()).ok();
-                self.pin.set_low();
+                self.pin.set_low().ok();
             } else {
                 block!(self.timer.wait()).ok();
-                self.pin.set_high();
+                self.pin.set_high().ok();
                 block!(self.timer.wait()).ok();
-                self.pin.set_low();
+                self.pin.set_low().ok();
                 block!(self.timer.wait()).ok();
             }
             data <<= 1;
